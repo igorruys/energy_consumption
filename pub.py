@@ -1,5 +1,6 @@
 # python 3.6
-# source: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
+# setup MQTT: https://www.youtube.com/watch?v=AsDHEDbyLfg&ab_channel=BRUHAutomation
+# sourcecode: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
 
 import random
 import time
