@@ -3,8 +3,12 @@
 # sourcecode: https://www.emqx.com/en/blog/how-to-use-mqtt-in-python
 
 import random
-
+import json
+import time
 from paho.mqtt import client as mqtt_client
+from os import path
+import csv
+from datetime import datetime
 
 
 broker = 'IP'
@@ -34,8 +38,21 @@ def subscribe(client: mqtt_client):
     def on_message(client, userdata, msg):
         print(f"Received `{msg.payload.decode()}` from `{msg.topic}` topic")
 
+    if not path.exists(light_file_name):
+        with open(light_file_name, mode='w') as csv_file:
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+
+    def handle_telemetry(client, userdata, message):
+        payload = json.loads(message.payload.decode())
+        print("Message received:", payload)
+
+        with open(light_file_name, mode='a') as light_file:        
+            light_writer = csv.DictWriter(light_file, fieldnames=fieldnames)
+            light_writer.writerow({'date' : datetime.now().astimezone().replace(microsecond=0).isoformat(), 'light' : payload['light']})
+
     client.subscribe(topic)
-    client.on_message = on_message
+    client.on_message = handle_telemetry
 
 
 def run():
@@ -45,4 +62,6 @@ def run():
 
 
 if __name__ == '__main__':
+    light_file_name = 'light.csv'
+    fieldnames = ['date', 'light']
     run()
